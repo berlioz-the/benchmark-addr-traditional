@@ -26,36 +26,12 @@ app.get('/', (request, response) => {
 app.get('/entries', (request, response) => {
     return executeQuery('SELECT * FROM contacts')
         .then(contacts => {
-            return Promise.serial(contacts, contact => {
-                var options = { url: `/status/${contact.id}`, json: true };
-                return berlioz.cluster('phone').request(options)
-                    .then(status => {
-                        console.log("**** THEN:")
-                        console.log(status)
-                        contact.status = status;
-                        contact.status.success = true;
-                    })
-                    .catch(reason => {
-                        console.log("**** CATCH:")
-                        console.log(reason.message);
-                        contact.status = {
-                            success: false
-                        };
-                    })
-                    .then(() => {
-                        console.log("**** CONTACT:")
-                        console.log(contact);
-                        return contact;
-                    });
-            });
-        })
-        .then(contacts => {
-            console.log("**** FINAL CONTACTS:")
+            console.log("**** CONTACTS:")
             console.log(contacts);
             response.send(contacts);
         })
         .catch(reason => {
-            console.log("**** FINAL ERROR:")
+            console.log("**** ERROR:")
             console.log(reason);
             response.status(400).send({
                error: reason.message
@@ -67,8 +43,8 @@ app.post('/entry', (request, response) => {
     if (!request.body.name || !request.body.phone) {
         return response.send({error: 'Missing name or phone'});
     }
-    var querySql = `INSERT INTO contacts(name, phone) VALUES('${request.body.name}', '${request.body.phone}')`;
-    return executeQuery(querySql)
+    var querySql = 'INSERT INTO contacts(name, phone) VALUES( ?, ? )';
+    return executeQuery(querySql, [request.body.name, request.body.phone])
         .then(() => {
             response.send({ success: true });
         })
@@ -94,15 +70,20 @@ app.listen(4000, '0.0.0.0', (err) => {
     console.log(`server is listening on 0.0.0.0:4000`)
 })
 
-function executeQuery(querySql)
+function executeQuery(querySql, inserts)
 {
-    console.log(`[executeQuery] query: ${querySql}`)
+    console.log(`[executeQuery] query: ${querySql}, inserts: ${JSON.stringify(inserts)}`);
     return getConnection()
-        .then(connection => connection.query(querySql))
+        .then(connection => connection.query(querySql, inserts))
         .then(result => {
             console.log(`Query ${querySql} result:`)
             console.log(result)
             return result;
+        })
+        .catch(reason => {
+            console.log("*** SQL ERROR:");
+            console.log(reason);
+            throw reason;
         });
 }
 

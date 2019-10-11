@@ -1,5 +1,6 @@
 const express = require('express');
 const request = require('request-promise');
+const bodyParser = require('body-parser')
 
 const app = express();
 
@@ -9,12 +10,18 @@ app.use(bodyParser.json())
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
+const APP_PEER = {
+    host: 'localhost',
+    port: 4000
+}
+APP_PEER.url = `http://${APP_PEER.host}:${APP_PEER.port}`;
+
 app.get('/', function (req, response) {
     var renderData = {
         entries: []
     };
 
-    var options = { url: 'http://localhost:1234/entries', json: true, resolveWithFullResponse: true };
+    var options = { url: `${APP_PEER.url}/entries`, json: true, resolveWithFullResponse: true };
     return request(options)
         .then(result => {
             if (result) {
@@ -36,8 +43,8 @@ app.get('/', function (req, response) {
         ;
 });
 
-app.post('/new-contact', (request, response) => {
-    var options = { url: 'http://localhost:1234/entry', method: 'POST', body: request.body, json: true };
+app.post('/new-contact', (req, response) => {
+    var options = { url: `${APP_PEER.url}/entry`, method: 'POST', body: req.body, json: true };
     return request(options)
         .then(result => {
             if (!result) {
