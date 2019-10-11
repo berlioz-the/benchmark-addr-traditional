@@ -22,13 +22,15 @@ We are going to deploy the app to Google Cloud Platform. We will make use of:
 
 ### Running Locally
 We need a single script *"run-local.sh"* to bring up the entire application locally on the computer. 
-Once the script is execute the application should be up and running, database - initialized.
+Once the script is executed the application should be up and running, database - initialized.
 Should also allow incremental changes to the code to be applied.
 
 ### Running In The Cloud
-We need a single script *"run-local.sh"* to deploy the entire application in the cloud. 
-Should deploy to a blank GCP Project. Should also allow incremental changes to the code
-to be applied.
+We need a single script *"run-local.sh"* to deploy the entire application in the cloud (GCP + GKE). 
+Should deploy to a blank GCP Project. Deployment service account is already created and path to 
+credentials file specified by **APP_GCP_CREDENTIALS_PATH**.
+Should also allow incremental changes to the code to be applied.
+
 
 ### CI/CD
 The CI/CD pipeline is implemented using CircleCI. 
