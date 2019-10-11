@@ -2,6 +2,7 @@
 ## Address Book App - Traditional Method
 
 This is a simple 3-tiered web app.
+
 ![App Diagram](diagram.png)
 
 Purpose of this repo is to compare development as well as  deployment processes using traditional methods vs using Berlioz.
