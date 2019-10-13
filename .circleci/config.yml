@@ -1,0 +1,22 @@
+version: 2.1
+
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.6.1
+
+workflows:
+  build:
+    jobs:
+      - gcp-gcr/build-and-push-image:
+          context: staging
+          image: berlioz
+          dockerfile: ./app/Dockerfile
+          tag: app
+          path: app
+          registry-url: us.gcr.io
+      - gcp-gcr/build-and-push-image:
+          context: staging
+          image: berlioz
+          dockerfile: web/Dockerfile
+          tag: web
+          path: web
+          registry-url: us.gcr.io
