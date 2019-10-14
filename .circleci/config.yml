@@ -6,7 +6,6 @@ orbs:
 workflows:
   build:
     jobs:
-      - test
       - gcp-gcr/build-and-push-image:
           context: staging
           image: berlioz
