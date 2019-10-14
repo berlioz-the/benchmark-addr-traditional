@@ -71,6 +71,7 @@ logs_berlioz/
 .vscode
 .history
 
+temp
 
 # Java
 **/out/production
