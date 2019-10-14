@@ -13,6 +13,9 @@ jobs:
       - run:
           name: Select terraform version
           command: tfswitch 0.12.10
+      - run:
+          name: test
+          command: pwd; ls -la
       - terraform/apply:
           path: .
           var: app_image=us.gcr.io/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/berlioz-web:${CIRCLE_SHA1}
