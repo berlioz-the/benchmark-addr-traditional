@@ -4,7 +4,7 @@ resource "kubernetes_config_map" "sql_dump" {
   }
 
   data = {
-    "init.sql" = file("../book/init.sql")
+    "init.sql" = file("${path.module}/files/init.sql")
   }
 }
 
