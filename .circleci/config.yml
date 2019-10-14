@@ -14,7 +14,7 @@ jobs:
           name: Select terraform version
           command: tfswitch 0.12.10
       - terraform/apply:
-          path: terraform/terraform
+          path: .
           var: app_image=us.gcr.io/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/berlioz-web:${CIRCLE_SHA1}
 
 workflows:
