@@ -26,9 +26,7 @@ workflows:
       - terraform/apply:
           context: staging
           path: terraform
-          var:
-            app_image: us.gcr.io/berlioz-app:${CIRCLE_SHA1}
-            web_image: us.gcr.io/berlioz-web:${CIRCLE_SHA1}
+          var: app_image=us.gcr.io/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/berlioz-web:${CIRCLE_SHA1}
           filters:
             branches:
               only: master
