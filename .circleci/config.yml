@@ -36,3 +36,4 @@ workflows:
           requires:
             - app_build
             - web_build
+
