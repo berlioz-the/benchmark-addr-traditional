@@ -85,3 +85,5 @@ logs_berlioz/
 **/target/*.war*
 **/target/*.pom*
 **/.idea/workspace.xml
+.idea/
+**/.terraform
