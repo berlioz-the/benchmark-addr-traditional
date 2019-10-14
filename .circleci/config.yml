@@ -7,14 +7,14 @@ orbs:
 jobs:
   terraform_apply:
     executor: terraform/terraform-0_12
-    working_directory: ~/project/terraform
+    working_directory: ~/project/terraform/terraform
     steps:
       - checkout
       - run:
           name: Select terraform version
           command: tfswitch 0.12.10
       - terraform/apply:
-          path: .
+          path: terraform/terraform
           var: app_image=us.gcr.io/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/berlioz-web:${CIRCLE_SHA1}
 
 workflows:
