@@ -3,9 +3,15 @@ version: 2.1
 orbs:
   gcp-gcr: circleci/gcp-gcr@0.6.1
 
+jobs:
+  test:
+    steps:
+      - checkout
+
 workflows:
   build:
     jobs:
+      - test
       - gcp-gcr/build-and-push-image:
           context: staging
           image: berlioz
