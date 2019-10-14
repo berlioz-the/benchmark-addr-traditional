@@ -17,6 +17,7 @@ jobs:
           command: pwd; ls -la
       - terraform/apply:
           path: terraform
+          auto_approve: true
           var_file: terraform/terraform.tfvars
           var: app_image=us.gcr.io/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/berlioz-web:${CIRCLE_SHA1}
 
