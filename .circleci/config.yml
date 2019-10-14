@@ -25,7 +25,6 @@ workflows:
           registry-url: us.gcr.io
       - terraform/apply:
           context: staging
-          executor: terraform/terraform-0_12
           path: terraform
           var:
             app_image: us.gcr.io/berlioz-app:${CIRCLE_SHA1}
