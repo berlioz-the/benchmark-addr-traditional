@@ -5,6 +5,8 @@ orbs:
 
 jobs:
   test:
+    docker:
+      - image: ubuntu:14.04
     steps:
       - checkout
 
