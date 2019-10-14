@@ -7,7 +7,7 @@ orbs:
 jobs:
   terraform_apply:
     executor: terraform/terraform-0_12
-    working_directory: terraform
+    working_directory: ~/project/terraform
     steps:
       - checkout
       - run:
