@@ -10,10 +10,10 @@ app.use(bodyParser.json())
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-const APP_PEER = {
-    host: 'localhost',
-    port: 4000
-}
+const APP_PEER = {}
+APP_PEER.host = process.env.APP_HOST || 'localhost'
+APP_PEER.port = process.env.APP_PORT || '4000'
+
 APP_PEER.url = `http://${APP_PEER.host}:${APP_PEER.port}`;
 
 app.get('/', function (req, response) {

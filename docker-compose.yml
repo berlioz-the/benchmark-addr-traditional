@@ -1,0 +1,35 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - ./book:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+    ports:
+      - 3306:3306
+  be:
+    build:
+      context: ./app
+    links:
+      - db
+    environment:
+      MYSQL_HOST: db
+    ports:
+      - 4000:4000
+    depends_on:
+      - db
+  fe:
+    build:
+      context: ./web
+    links:
+      - be
+    environment:
+      APP_HOST: be
+      APP_PORT: 4000
+    ports:
+      - 3000:3000
+    depends_on:
+      - be

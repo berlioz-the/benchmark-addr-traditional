@@ -9,10 +9,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 const DBConfig = {};
-DBConfig.host = '127.0.0.1'
-DBConfig.user = 'root';
-DBConfig.password = '';
-DBConfig.database = 'demo';
+DBConfig.host = process.env.MYSQL_HOST || '127.0.0.1'
+DBConfig.user = process.env.MYSQL_USER || 'root';
+DBConfig.password = process.env.MYSQL_PASSWORD || '';
+DBConfig.database = process.env.MYSQL_DB || 'demo';
 var DBConnection = null;
 
 app.get('/', (request, response) => {

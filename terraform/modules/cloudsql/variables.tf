@@ -4,10 +4,6 @@ variable "machine_type" {
 
 variable "gcp_project_id" {}
 
-variable "instance_name" {
-  default = "berlioz_sql_instance"
-}
-
 variable "database_name" {
   default = "berliozdb"
 }
@@ -15,3 +11,5 @@ variable "database_name" {
 variable "database_user" {
   default = "berlioz"
 }
+
+variable "network" {}
