@@ -1,9 +1,6 @@
 resource "kubernetes_service" "app" {
   metadata {
     name = "app"
-//    annotations = {
-//      "cloud.google.com/neg" = "{\"ingress\": true}"
-//    }
   }
 
   spec {
@@ -17,10 +14,6 @@ resource "kubernetes_service" "app" {
       target_port = 4000
     }
   }
-
-//  lifecycle {
-//    ignore_changes = [metadata[0].annotations]
-//  }
 }
 
 resource "kubernetes_service" "web" {

@@ -34,6 +34,10 @@ resource "google_sql_database_instance" "master" {
       private_network = data.google_compute_network.gke_network.self_link
     }
   }
+
+  depends_on = [
+    google_service_networking_connection.sql_peering_connection
+  ]
 }
 
 resource "google_sql_database" "db" {
