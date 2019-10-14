@@ -4,6 +4,15 @@ orbs:
   gcp-gcr: circleci/gcp-gcr@0.6.1
   terraform: ovotech/terraform@1.5
 
+jobs:
+  terraform_apply:
+    executor: terraform/terraform-0_12
+    steps:
+      - checkout
+      - terraform/apply:
+          path: terraform
+          var: app_image=us.gcr.io/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/berlioz-web:${CIRCLE_SHA1}
+
 workflows:
   build:
     jobs:
@@ -23,10 +32,8 @@ workflows:
           tag: ${CIRCLE_SHA1}
           path: web
           registry-url: us.gcr.io
-      - terraform/apply:
+      - terraform_apply:
           context: staging
-          path: terraform
-          var: app_image=us.gcr.io/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/berlioz-web:${CIRCLE_SHA1}
           filters:
             branches:
               only: master
