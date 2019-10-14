@@ -2,21 +2,50 @@ version: 2.1
 
 orbs:
   gcp-gcr: circleci/gcp-gcr@0.6.1
+  terraform: ovotech/terraform@1.5
+
+jobs:
+  terraform_apply:
+    executor: terraform/terraform-0_12
+    steps:
+      - checkout
+      - run:
+          name: Select terraform version
+          command: tfswitch 0.12.10
+      - run:
+          name: test
+          command: pwd; ls -la
+      - terraform/apply:
+          path: terraform
+          auto_approve: true
+          var_file: terraform/terraform.tfvars
+          var: app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1}
 
 workflows:
   build:
     jobs:
       - gcp-gcr/build-and-push-image:
+          name: app_build
           context: staging
-          image: berlioz
+          image: berlioz-app
           dockerfile: ./app/Dockerfile
-          tag: app
+          tag: ${CIRCLE_SHA1}
           path: app
           registry-url: us.gcr.io
       - gcp-gcr/build-and-push-image:
+          name: web_build
           context: staging
-          image: berlioz
+          image: berlioz-web
           dockerfile: web/Dockerfile
-          tag: web
+          tag: ${CIRCLE_SHA1}
           path: web
           registry-url: us.gcr.io
+      - terraform_apply:
+          context: staging
+          filters:
+            branches:
+              only: master
+          requires:
+            - app_build
+            - web_build
+

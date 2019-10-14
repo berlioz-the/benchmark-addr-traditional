@@ -33,7 +33,6 @@ resource "google_container_cluster" "primary" {
   initial_node_count = 1
   network            = google_compute_network.gke_network.name
   subnetwork         = google_compute_subnetwork.gke_subnetwork.name
-//  min_master_version = "1.12.7-gke.10"
 
   ip_allocation_policy {
     cluster_secondary_range_name  = local.pods_subnet_range
