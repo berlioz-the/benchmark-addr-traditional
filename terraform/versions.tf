@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 0.12"
   backend "gcs" {
-    bucket      = "terraform-berlioz-state"
+    bucket      = "123123123-terraform-berlioz-state"
     prefix      = "terraform/state"
   }
 }
