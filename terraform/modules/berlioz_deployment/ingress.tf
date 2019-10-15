@@ -1,6 +1,13 @@
+resource "google_compute_global_address" "berlioz_address" {
+  name = "berioz-address"
+}
+
 resource "kubernetes_ingress" "berlioz_ingress" {
   metadata {
     name = "berlioz-ingress"
+    annotations = {
+      "kubernetes.io/ingress.global-static-ip-name" = "berioz-address"
+    }
   }
   spec {
     backend {

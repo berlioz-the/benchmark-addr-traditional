@@ -1,3 +1,3 @@
-output "http_address" {
-  value = kubernetes_ingress.berlioz_ingress.load_balancer_ingress[0].ip
+output "ip_address" {
+  value = google_compute_global_address.berlioz_address.address
 }
