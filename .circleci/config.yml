@@ -12,14 +12,15 @@ jobs:
       - run:
           name: Select terraform version
           command: tfswitch 0.12.10
-      - run:
-          name: test
-          command: pwd; ls -la
       - terraform/apply:
           path: terraform
           auto_approve: true
-          var_file: terraform/terraform.tfvars
-          var: app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1}
+          backend_config: bucket="${TF_STATE_GCS_BUCKET}",prefix="terraform/state"
+          var: >
+            app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1},
+            web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1},
+            gcp_project_id=${GOOGLE_PROJECT_ID},
+            gcp_region=${GOOGLE_COMPUTE_REGION}
 
 workflows:
   build:
