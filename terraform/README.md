@@ -3,6 +3,7 @@
     gcloud services enable compute.googleapis.com
     gcloud services enable servicenetworking.googleapis.com
     gcloud services enable cloudresourcemanager.googleapis.com
+    gcloud services enable sqladmin.googleapis.com
 3. create service account and generate the access token:
     gcloud iam service-accounts create terraform --display-name="Terraform CI"
     gcloud projects add-iam-policy-binding berlioz-255809 --member serviceAccount:terraform@berlioz-255809.iam.gserviceaccount.com --role roles/editor

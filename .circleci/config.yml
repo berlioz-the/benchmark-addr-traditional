@@ -7,17 +7,18 @@ orbs:
 jobs:
   terraform_apply:
     executor: terraform/terraform-0_12
+    environment:
+      TF_VAR_gcp_project_id: ${GOOGLE_PROJECT_ID}
+      TF_VAR_gcp_region: ${GOOGLE_COMPUTE_REGION}
     steps:
       - checkout
       - run:
           name: Select terraform version
           command: tfswitch 0.12.10
-      - run:
-          name: test
-          command: pwd; ls -la
       - terraform/apply:
           path: terraform
           auto_approve: true
+          backend_config: bucket="${TF_STATE_GCS_BUCKET}",prefix="terraform/state"
           var_file: terraform/terraform.tfvars
           var: app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1},web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1}
 
