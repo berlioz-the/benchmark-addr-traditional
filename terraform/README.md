@@ -6,6 +6,7 @@ gcloud services enable servicenetworking.googleapis.com
 gcloud services enable cloudresourcemanager.googleapis.com
 gcloud services enable sqladmin.googleapis.com
 gcloud services enable containerregistry.googleapis.com
+gcloud services enable container.googleapis.com
 ```
 #### create service account and generate the access token
 Use the name and display name you prefer (the name is terraform in the example)
