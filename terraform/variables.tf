@@ -9,3 +9,7 @@ variable "gke_instance_type" {
 variable "app_image" {}
 
 variable "web_image" {}
+
+variable "https_hostname" {
+  default = ""
+}

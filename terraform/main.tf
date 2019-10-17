@@ -38,4 +38,5 @@ module "berlioz_deployment" {
   mysql_password = module.cloudsql.password
   app_image = var.app_image
   web_image = var.web_image
+  https_hostname = var.https_hostname
 }
