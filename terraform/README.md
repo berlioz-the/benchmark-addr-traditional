@@ -32,6 +32,7 @@ TF_STATE_GCS_BUCKET = ${bucket name from the previuous step without gs://, terra
 TF_VAR_https_hostname = https hostname (OPTIONAL)
 ```
 If TF_VAR_https_hostname is defined then terraform will create GCP managed let's encrypt certificate and apply it for the ingress. Ingress will be configured as https load-balancer with disabled http.
+In order to have it correctly working DNS name should be matched to ingress ip address. This will allow to pass acme challenge.
 #### trigger configuration manually
 - build app and web docker images and push them to GCR
 - initialize terraform
