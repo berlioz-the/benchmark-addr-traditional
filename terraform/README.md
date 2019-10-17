@@ -33,12 +33,22 @@ TF_VAR_https_hostname = https hostname (OPTIONAL)
 ```
 If TF_VAR_https_hostname is defined then terraform will create GCP managed let's encrypt certificate and apply it for the ingress. Ingress will be configured as https load-balancer with disabled http.
 In order to have it correctly working DNS name should be matched to ingress ip address. This will allow to pass acme challenge.
+
 #### trigger configuration manually
 - build app and web docker images and push them to GCR
 - initialize terraform
+
+export GOOGLE_PROJECT_ID="gcp-project-id"
+export GOOGLE_COMPUTE_REGION="gcp-region"
+export GOOGLE_CREDENTIALS="contents-of-service-account-credentials"
+export CIRCLE_SHA1="some-sha"
+export TF_STATE_GCS_BUCKET="gcp-storage-bucket-name"
+
 ```shell script
 cd terraform
-terraform init -backend-config=bucket="terraform-berlioz-state" -backend-config=prefix="terraform/state"
-terraform apply terraform plan -var app_image=us.gcr.io/berlioz-255809/berlioz@sha256:2e4e03b4f5dbc38eea40c3e2dc18d0ff1b4130124ae2d436381f5190f84b1d0b -var web_image=us.gcr.io/berlioz-255809/berlioz@sha256:421f14a1a30ae68d26c5cd1f1263fa6db2262f2336a6671d48584ade1eeca2c3 -var gcp_project_id=berlioz-255809 -var gcp_region=us-central1
-```
+terraform init -backend-config=bucket="${TF_STATE_GCS_BUCKET}" -backend-config=prefix="terraform/state"
+terraform plan -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1} -var web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1} -var gcp_project_id=${GOOGLE_PROJECT_ID} -var gcp_region=${GOOGLE_COMPUTE_REGION}
+terraform refresh -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1} -var web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1} -var gcp_project_id=${GOOGLE_PROJECT_ID} -var gcp_region=${GOOGLE_COMPUTE_REGION}
+terraform apply --auto-approve -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1} -var web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1} -var gcp_project_id=${GOOGLE_PROJECT_ID} -var gcp_region=${GOOGLE_COMPUTE_REGION}
+terraform destroy --auto-approve  -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1} -var web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1} -var gcp_project_id=${GOOGLE_PROJECT_ID} -var gcp_region=${GOOGLE_COMPUTE_REGION}```
 
