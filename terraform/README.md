@@ -1,6 +1,9 @@
 #### create the project and initialize gcloud sdk
+export GOOGLE_PROJECT_ID=${your project id}
+
 #### enable required apis:
 ```shell script
+gcloud config set project ${GOOGLE_PROJECT_ID}
 gcloud services enable compute.googleapis.com
 gcloud services enable servicenetworking.googleapis.com
 gcloud services enable cloudresourcemanager.googleapis.com
@@ -11,11 +14,10 @@ gcloud services enable container.googleapis.com
 #### create service account and generate the access token
 Use the name and display name you prefer (the name is terraform in the example)
 ```shell script
-export gcp_project_id=${your project id}
 gcloud iam service-accounts create terraform --display-name="Terraform CI"
-gcloud projects add-iam-policy-binding ${gcp_project_id} --member serviceAccount:terraform@${gcp_project_id}.iam.gserviceaccount.com --role roles/editor
-gcloud projects add-iam-policy-binding ${gcp_project_id} --member serviceAccount:terraform@${gcp_project_id}.iam.gserviceaccount.com --role roles/compute.networkAdmin
-gcloud iam service-accounts keys create ~/berlioz.json --iam-account=terraform@${gcp_project_id}.iam.gserviceaccount.com
+gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT_ID} --member serviceAccount:terraform@${GOOGLE_PROJECT_ID}.iam.gserviceaccount.com --role roles/editor
+gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT_ID} --member serviceAccount:terraform@${GOOGLE_PROJECT_ID}.iam.gserviceaccount.com --role roles/compute.networkAdmin
+gcloud iam service-accounts keys create berlioz-credentials.json --iam-account=terraform@${GOOGLE_PROJECT_ID}.iam.gserviceaccount.com
 ```
 #### create GCS bucket for terraform state
 ```shell script
