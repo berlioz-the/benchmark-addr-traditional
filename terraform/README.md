@@ -51,4 +51,15 @@ terraform plan -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCL
 terraform refresh -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1} -var web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1} -var gcp_project_id=${GOOGLE_PROJECT_ID} -var gcp_region=${GOOGLE_COMPUTE_REGION}
 terraform apply --auto-approve -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1} -var web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1} -var gcp_project_id=${GOOGLE_PROJECT_ID} -var gcp_region=${GOOGLE_COMPUTE_REGION}
 terraform destroy --auto-approve  -var app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1} -var web_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-web:${CIRCLE_SHA1} -var gcp_project_id=${GOOGLE_PROJECT_ID} -var gcp_region=${GOOGLE_COMPUTE_REGION}```
+```
 
+#### Destroy the deployment
+1. Ingress should be deleted first
+```shell script
+terraform destroy -target=module.berlioz_deployment.kubernetes_ingress.berlioz_ingress
+```
+2. Wait 1 min while gce controller is deleting load balancer resources
+3. Delete all other resources
+```shell script
+terraform destroy
+```
