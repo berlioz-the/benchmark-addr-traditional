@@ -13,4 +13,3 @@ variable "web_image" {}
 variable "https_hostname" {
   default = ""
 }
-

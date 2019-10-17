@@ -29,7 +29,9 @@ GOOGLE_COMPUTE_REGION = ${GCP region, us-central1 for example}
 GOOGLE_COMPUTE_ZONE = ${GCP zone, us-central1-a for example}
 GOOGLE_PROJECT_ID = ${GCP project id}
 TF_STATE_GCS_BUCKET = ${bucket name from the previuous step without gs://, terraform-berlioz-state in the example}
+TF_VAR_https_hostname = https hostname (OPTIONAL)
 ```
+If TF_VAR_https_hostname is defined then terraform will create GCP managed let's encrypt certificate and apply it for the ingress. Ingress will be configured as https load-balancer with disabled http.
 #### trigger configuration manually
 - build app and web docker images and push them to GCR
 - initialize terraform
