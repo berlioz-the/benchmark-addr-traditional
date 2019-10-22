@@ -1,6 +1,13 @@
+resource "kubernetes_namespace" "berlioz" {
+  metadata {
+    generate_name = "berlioz-"
+  }
+}
+
 resource "kubernetes_deployment" "app" {
   metadata {
     name = "app"
+    namespace = kubernetes_namespace.berlioz.metadata[0].name
   }
   spec {
     replicas = 1
@@ -43,6 +50,12 @@ resource "kubernetes_deployment" "app" {
               name = kubernetes_config_map.sql_conn.metadata[0].name
             }
           }
+
+          env_from {
+            secret_ref {
+              name = kubernetes_secret.mysql_password.metadata[0].name
+            }
+          }
         }
 
         volume {
@@ -63,6 +76,7 @@ resource "kubernetes_deployment" "app" {
 resource "kubernetes_deployment" "web" {
   metadata {
     name = "web"
+    namespace = kubernetes_namespace.berlioz.metadata[0].name
   }
   spec {
     replicas = 1

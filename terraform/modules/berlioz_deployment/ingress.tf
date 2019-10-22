@@ -16,6 +16,7 @@ resource "google_compute_managed_ssl_certificate" "berlioz_ssl_certificate" {
 resource "kubernetes_ingress" "berlioz_ingress" {
   metadata {
     name = "berlioz-ingress"
+    namespace = kubernetes_namespace.berlioz.metadata[0].name
     annotations = {
       "kubernetes.io/ingress.global-static-ip-name" = "berioz-address"
       "ingress.gcp.kubernetes.io/pre-shared-cert" = var.https_hostname == "" ? null : "berlioz-ssl-certificate"
