@@ -39,6 +39,12 @@ resource "kubernetes_deployment" "app" {
               name = kubernetes_config_map.sql_conn.metadata[0].name
             }
           }
+
+          env_from {
+            secret_ref {
+              name = kubernetes_secret.mysql_password.metadata[0].name
+            }
+          }
         }
 
         container {

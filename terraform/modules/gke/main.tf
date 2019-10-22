@@ -85,5 +85,4 @@ resource "google_container_cluster" "primary" {
       auth = "AUTH_MUTUAL_TLS"
     }
   }
-
 }
