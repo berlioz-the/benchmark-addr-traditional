@@ -79,8 +79,11 @@ resource "google_container_cluster" "primary" {
     }
   }
 
-  istio_config {
-    disabled = false
-    auth = "AUTH_MUTUAL_TLS"
+  addons_config {
+    istio_config {
+      disabled = false
+      auth = "AUTH_MUTUAL_TLS"
+    }
   }
+
 }
