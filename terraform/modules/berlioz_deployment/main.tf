@@ -1,6 +1,9 @@
 resource "kubernetes_namespace" "berlioz" {
   metadata {
     generate_name = "berlioz-"
+    labels = {
+      istio-injection = "enabled"
+    }
   }
 }
 
@@ -50,6 +53,10 @@ resource "kubernetes_deployment" "app" {
         container {
           name = "app"
           image = var.app_image
+
+          port {
+            container_port = 4000
+          }
 
           env_from {
             config_map_ref {
@@ -102,9 +109,13 @@ resource "kubernetes_deployment" "web" {
           name = "web"
           image = var.web_image
 
+          port {
+            container_port = 3000
+          }
+
           env {
             name = "APP_HOST"
-            value = kubernetes_service.app.metadata[0].name
+            value = "${kubernetes_service.app.metadata[0].name}.${kubernetes_namespace.berlioz.metadata[0].name}.svc.cluster.local"
           }
 
           env {
