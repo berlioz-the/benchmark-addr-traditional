@@ -26,11 +26,42 @@ resource "google_compute_subnetwork" "gke_subnetwork" {
   }
 }
 
+resource "google_container_node_pool" "node_pool_1" {
+  cluster = google_container_cluster.primary.name
+  location = "${var.region}-a"
+  initial_node_count = 1
+
+  node_config {
+    metadata = {
+      disable-legacy-endpoints = true
+    }
+    machine_type = var.instance_type
+
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_write",
+      "https://www.googleapis.com/auth/monitoring",
+      "https://www.googleapis.com/auth/logging.write",
+    ]
+  }
+
+  autoscaling {
+    max_node_count = 3
+    min_node_count = 1
+  }
+
+  management {
+    auto_repair = true
+    auto_upgrade = true
+  }
+}
+
 resource "google_container_cluster" "primary" {
+  provider = "google-beta"
   name     = "kube-cluster-1"
   location = "${var.region}-a"
 
   initial_node_count = 1
+  remove_default_node_pool = true
   network            = google_compute_network.gke_network.name
   subnetwork         = google_compute_subnetwork.gke_subnetwork.name
 
@@ -48,28 +79,10 @@ resource "google_container_cluster" "primary" {
     }
   }
 
-  node_config {
-    metadata = {
-      disable-legacy-endpoints = true
+  addons_config {
+    istio_config {
+      disabled = false
+      auth = "AUTH_MUTUAL_TLS"
     }
-    machine_type = var.instance_type
-
-
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/devstorage.read_write",
-      "https://www.googleapis.com/auth/monitoring",
-      "https://www.googleapis.com/auth/logging.write",
-    ]
   }
-
-//  lifecycle {
-//    ignore_changes = [master_auth,
-//      network,
-//      subnetwork,
-//      node_config
-//    ]
-//    https://github.com/hashicorp/terraform/issues/21433
-//    ignore_changes = all
-//    prevent_destroy = true
-//  }
 }

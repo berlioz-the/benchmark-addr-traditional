@@ -1,6 +1,16 @@
+resource "kubernetes_namespace" "berlioz" {
+  metadata {
+    generate_name = "berlioz-"
+    labels = {
+      istio-injection = "enabled"
+    }
+  }
+}
+
 resource "kubernetes_deployment" "app" {
   metadata {
     name = "app"
+    namespace = kubernetes_namespace.berlioz.metadata[0].name
   }
   spec {
     replicas = 1
@@ -32,15 +42,31 @@ resource "kubernetes_deployment" "app" {
               name = kubernetes_config_map.sql_conn.metadata[0].name
             }
           }
+
+          env_from {
+            secret_ref {
+              name = kubernetes_secret.mysql_password.metadata[0].name
+            }
+          }
         }
 
         container {
           name = "app"
           image = var.app_image
 
+          port {
+            container_port = 4000
+          }
+
           env_from {
             config_map_ref {
               name = kubernetes_config_map.sql_conn.metadata[0].name
+            }
+          }
+
+          env_from {
+            secret_ref {
+              name = kubernetes_secret.mysql_password.metadata[0].name
             }
           }
         }
@@ -63,6 +89,7 @@ resource "kubernetes_deployment" "app" {
 resource "kubernetes_deployment" "web" {
   metadata {
     name = "web"
+    namespace = kubernetes_namespace.berlioz.metadata[0].name
   }
   spec {
     replicas = 1
@@ -82,9 +109,13 @@ resource "kubernetes_deployment" "web" {
           name = "web"
           image = var.web_image
 
+          port {
+            container_port = 3000
+          }
+
           env {
             name = "APP_HOST"
-            value = kubernetes_service.app.metadata[0].name
+            value = "${kubernetes_service.app.metadata[0].name}.${kubernetes_namespace.berlioz.metadata[0].name}.svc.cluster.local"
           }
 
           env {
