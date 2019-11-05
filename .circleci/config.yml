@@ -22,6 +22,13 @@ jobs:
             gcp_project_id=${GOOGLE_PROJECT_ID},
             gcp_region=${GOOGLE_COMPUTE_REGION}
 
+  terraform_undeploy:
+    executor: terraform/terraform-0_12
+    steps:
+      - run:
+          name: Select terraform version
+          command: tfswitch 0.12.10
+
 workflows:
   build:
     jobs:
@@ -50,3 +57,11 @@ workflows:
             - app_build
             - web_build
 
+
+  undeploy:
+    jobs:
+      - hold:
+          type: approval
+      - terraform_undeploy:
+          requires: 
+            - hold
