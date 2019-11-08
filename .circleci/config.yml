@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           name: Select terraform version
-          command: tfswitch 0.12.10
+          command: tfswitch 0.12.13
       - terraform/apply:
           path: terraform
           auto_approve: true
@@ -27,7 +27,7 @@ jobs:
     steps:
       - run:
           name: Select terraform version
-          command: tfswitch 0.12.10
+          command: tfswitch 0.12.13
 
 workflows:
   build:
