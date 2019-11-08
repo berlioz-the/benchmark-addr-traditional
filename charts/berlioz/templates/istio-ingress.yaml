@@ -1,0 +1,56 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: berlioz
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Values.frontend.name }}
+spec:
+  hosts:
+  - '*'
+  gateways:
+  - berlioz
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: {{ .Values.frontend.port }}
+        host: {{ .Values.frontend.name }}
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Values.backend.name }}
+spec:
+  hosts:
+  - {{ .Values.backend.name }}
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        port:
+          number: {{ .Values.backend.port }}
+        host: {{ .Values.backend.name }}
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
