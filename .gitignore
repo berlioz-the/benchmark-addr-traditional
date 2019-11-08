@@ -88,3 +88,4 @@ temp
 **/.idea/workspace.xml
 .idea/
 **/.terraform
+**/*.tfvars

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.name }}
+  labels:
+    app: {{ .Values.backend.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.name }}
+  template:
+    metadata:
+{{/*      annotations:*/}}
+{{/*        sidecar.istio.io/userVolume: '[{"name": "db", "secret": {"secretName": "cloudsql"}}]'*/}}
+{{/*        sidecar.istio.io/userVolumeMount: '[{"mountPath": "/etc/sqlcerts", "name": "db", "readOnly": true}]'*/}}
+      labels:
+        app: {{ .Values.backend.name }}
+    spec:
+      initContainers:
+        - name: database-init
+          image: "arey/mysql-client"
+          command:
+            - "/bin/sh"
+            - "-c"
+          args:
+            - "mysql -h$(MYSQL_HOST) -u$(MYSQL_USER) -p$(MYSQL_PASSWORD) < /dump/init.sql"
+          volumeMounts:
+            - mountPath: /dump
+              name: sql-schema
+          envFrom:
+            - secretRef:
+                name: {{ .Values.database.secretName }}
+      containers:
+        - name: app
+          image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.port }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.database.secretName }}
+      volumes:
+        - name: sql-schema
+          configMap:
+            name: sql-schema
+            items:
+              - key: dump
+                path: init.sql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.frontend.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.frontend.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.name }}
+    spec:
+      containers:
+        - name: web
+          image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+          ports:
+            - containerPort: {{ .Values.frontend.port }}
+          env:
+            - name: APP_HOST
+              value: {{ .Values.backend.name }}.{{ .Release.Namespace }}.svc.cluster.local
+            - name: APP_PORT
+              value: {{ .Values.backend.port | quote }}

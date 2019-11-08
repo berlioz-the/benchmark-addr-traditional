@@ -1,7 +1,7 @@
 resource "kubernetes_config_map" "sql_dump" {
   metadata {
     name = "sql-dump"
-    namespace = kubernetes_namespace.berlioz.metadata[0].name
+    namespace = "berlioz"
   }
 
   data = {
@@ -12,7 +12,7 @@ resource "kubernetes_config_map" "sql_dump" {
 resource "kubernetes_config_map" "sql_conn" {
   metadata {
     name = "sql-conn"
-    namespace = kubernetes_namespace.berlioz.metadata[0].name
+    namespace = "berlioz"
   }
 
   data = {
@@ -23,8 +23,8 @@ resource "kubernetes_config_map" "sql_conn" {
 
 resource "kubernetes_secret" "mysql_password" {
   metadata {
-    generate_name = "mysql-"
-    namespace = kubernetes_namespace.berlioz.metadata[0].name
+    name = "mysql"
+    namespace = "berlioz"
   }
   data = {
     "MYSQL_PASSWORD" = var.mysql_password

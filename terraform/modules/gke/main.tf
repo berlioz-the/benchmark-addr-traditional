@@ -1,8 +1,3 @@
-locals {
-  pods_subnet_range     = "gke-pods"
-  services_subnet_range = "gke-services"
-}
-
 resource "google_compute_network" "gke_network" {
   name                    = "gke-network"
   auto_create_subnetworks = false
@@ -16,12 +11,12 @@ resource "google_compute_subnetwork" "gke_subnetwork" {
   private_ip_google_access = true
 
   secondary_ip_range {
-    ip_cidr_range = "10.0.0.0/16"
+    ip_cidr_range = "10.100.0.0/16"
     range_name    = local.pods_subnet_range
   }
 
   secondary_ip_range {
-    ip_cidr_range = "10.1.0.0/16"
+    ip_cidr_range = "10.101.0.0/16"
     range_name    = local.services_subnet_range
   }
 }
@@ -29,7 +24,7 @@ resource "google_compute_subnetwork" "gke_subnetwork" {
 resource "google_container_node_pool" "node_pool_1" {
   cluster = google_container_cluster.primary.name
   location = "${var.region}-a"
-  initial_node_count = 1
+  initial_node_count = 2
 
   node_config {
     metadata = {
@@ -45,13 +40,18 @@ resource "google_container_node_pool" "node_pool_1" {
   }
 
   autoscaling {
-    max_node_count = 3
-    min_node_count = 1
+    max_node_count = 4
+    min_node_count = 2
   }
 
   management {
     auto_repair = true
     auto_upgrade = true
+  }
+
+  timeouts {
+    create = "30m"
+    delete = "30m"
   }
 }
 
@@ -79,10 +79,30 @@ resource "google_container_cluster" "primary" {
     }
   }
 
-  addons_config {
-    istio_config {
-      disabled = false
-      auth = "AUTH_MUTUAL_TLS"
-    }
+//  addons_config {
+//    istio_config {
+//      disabled = false
+//      auth = "AUTH_MUTUAL_TLS"
+//    }
+//  }
+
+  provisioner "local-exec" {
+    when = "destroy"
+    command = "sleep 90"
   }
+}
+
+resource "null_resource" "dependency_setter" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+
+  triggers = {
+    cluster_id = google_container_cluster.primary.id
+  }
+
+  depends_on = [
+    google_container_cluster.primary,
+    google_container_node_pool.node_pool_1
+  ]
 }
