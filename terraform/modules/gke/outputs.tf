@@ -9,3 +9,7 @@ output "endpoint" {
 output "network" {
   value = google_compute_network.gke_network.name
 }
+
+output "depended_on" {
+  value = null_resource.dependency_setter.id
+}

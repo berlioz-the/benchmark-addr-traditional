@@ -22,21 +22,22 @@ module "cloudsql" {
   network = module.gke.network
 }
 
-data "google_client_config" "default" {}
-
-provider "kubernetes" {
-  load_config_file       = false
-  host                   = module.gke.endpoint
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.gke.cluster_ca_certificate)
+resource "google_compute_address" "istio_gateway_address" {
+  name = "istio-gateway-address"
+  address_type = "EXTERNAL"
 }
 
-module "berlioz_deployment" {
-  source = "./modules/berlioz_deployment"
-  mysql_host = module.cloudsql.private_ip_address
+data "google_client_config" "default" {}
+
+module "berlioz" {
+  source = "./modules/berlioz"
+  gateway_address = google_compute_address.istio_gateway_address.address
+  gke_endpoint = module.gke.endpoint
+  access_token = data.google_client_config.default.access_token
+  cluster_ca_certificate = module.gke.cluster_ca_certificate
+  dependencies = [module.gke.depended_on]
+  mysql_address = module.cloudsql.private_ip_address
   mysql_user = module.cloudsql.user_name
   mysql_password = module.cloudsql.password
-  app_image = var.app_image
-  web_image = var.web_image
-  https_hostname = var.https_hostname
+  mysql_database = module.cloudsql.database_name
 }

@@ -32,12 +32,18 @@ resource "google_sql_database_instance" "master" {
     ip_configuration {
       ipv4_enabled    = true
       private_network = data.google_compute_network.gke_network.self_link
+      require_ssl = false
     }
   }
 
   depends_on = [
     google_service_networking_connection.sql_peering_connection
   ]
+}
+
+resource "google_sql_ssl_cert" "client_cert" {
+  common_name = "client-cert"
+  instance = google_sql_database_instance.master.name
 }
 
 resource "google_sql_database" "db" {
