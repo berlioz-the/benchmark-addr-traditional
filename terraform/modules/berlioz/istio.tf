@@ -55,7 +55,7 @@ resource "null_resource" "wait_istio" {
 }
 
 resource "helm_release" "berlioz" {
-  chart = "../charts/berlioz"
+  chart = "${path.root}/../charts/berlioz"
   name = "berlioz"
   namespace = kubernetes_namespace.berlioz_namespace.metadata[0].name
   depends_on = [null_resource.wait_istio]

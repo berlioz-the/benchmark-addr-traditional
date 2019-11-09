@@ -17,6 +17,7 @@ Use the name and display name you prefer (the name is terraform in the example)
 gcloud iam service-accounts create terraform --display-name="Terraform CI"
 gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT_ID} --member serviceAccount:terraform@${GOOGLE_PROJECT_ID}.iam.gserviceaccount.com --role roles/editor
 gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT_ID} --member serviceAccount:terraform@${GOOGLE_PROJECT_ID}.iam.gserviceaccount.com --role roles/compute.networkAdmin
+gcloud projects add-iam-policy-binding ${GOOGLE_PROJECT_ID} --member serviceAccount:terraform@${GOOGLE_PROJECT_ID}.iam.gserviceaccount.com --role roles/container.admin
 gcloud iam service-accounts keys create berlioz-credentials.json --iam-account=terraform@${GOOGLE_PROJECT_ID}.iam.gserviceaccount.com
 ```
 #### create GCS bucket for terraform state
