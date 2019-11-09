@@ -10,7 +10,7 @@ resource "helm_release" "istio_init" {
   repository = data.helm_repository.istio_release.metadata[0].name
   wait = true
   timeout = 1200
-  depends_on = [null_resource.dependency_getter, kubernetes_cluster_role_binding.tiller]
+  depends_on = [null_resource.dependency_getter]
   provisioner "local-exec" {
     when = "destroy"
     command = "sleep 180"

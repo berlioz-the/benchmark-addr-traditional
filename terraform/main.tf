@@ -1,18 +1,8 @@
-provider "google" {
-  project   = var.gcp_project_id
-  region    = var.gcp_region
-}
-
-provider "google-beta" {
-  project   = var.gcp_project_id
-  region    = var.gcp_region
-}
-
-provider "random" {}
-
 module "gke" {
   source = "./modules/gke"
+
   region = var.gcp_region
+  instance_type = var.gke_instance_type
 }
 
 module "cloudsql" {
@@ -27,17 +17,15 @@ resource "google_compute_address" "istio_gateway_address" {
   address_type = "EXTERNAL"
 }
 
-data "google_client_config" "default" {}
-
 module "berlioz" {
   source = "./modules/berlioz"
+
   gateway_address = google_compute_address.istio_gateway_address.address
-  gke_endpoint = module.gke.endpoint
-  access_token = data.google_client_config.default.access_token
-  cluster_ca_certificate = module.gke.cluster_ca_certificate
-  dependencies = [module.gke.depended_on]
+  dependencies = [module.gke.depended_on, kubernetes_cluster_role_binding.tiller.id]
   mysql_address = module.cloudsql.private_ip_address
   mysql_user = module.cloudsql.user_name
   mysql_password = module.cloudsql.password
   mysql_database = module.cloudsql.database_name
+  app_image = var.app_image
+  web_image = var.web_image
 }
