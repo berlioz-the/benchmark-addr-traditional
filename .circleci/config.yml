@@ -30,7 +30,6 @@ jobs:
           command: tfswitch 0.12.13
       - terraform/destroy:
           path: terraform
-          auto_approve: true
           backend_config: bucket="${TF_STATE_GCS_BUCKET}",prefix="terraform/state"
           var: >
             app_image=us.gcr.io/${GOOGLE_PROJECT_ID}/berlioz-app:${CIRCLE_SHA1},
