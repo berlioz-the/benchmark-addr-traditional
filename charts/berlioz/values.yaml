@@ -4,15 +4,11 @@ database:
 backend:
   name: app
   port: 4000
-  image:
-    repository: us.gcr.io/berlioz2/berlioz-app
-    tag: 7fc7db6881ea5a2873e5d22bdc5cebd81af4b125
-    pullPolicy: IfNotPresent
+  image: us.gcr.io/berlioz2/berlioz-app:7fc7db6881ea5a2873e5d22bdc5cebd81af4b125
+  pullPolicy: IfNotPresent
 
 frontend:
   name: web
   port: 3000
-  image:
-    repository: us.gcr.io/berlioz2/berlioz-web
-    tag: 7fc7db6881ea5a2873e5d22bdc5cebd81af4b125
-    pullPolicy: IfNotPresent
+  image: us.gcr.io/berlioz2/berlioz-web:7fc7db6881ea5a2873e5d22bdc5cebd81af4b125
+  pullPolicy: IfNotPresent

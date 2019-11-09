@@ -1,39 +1,6 @@
-provider "null" {}
-
 resource "null_resource" "dependency_getter" {
   provisioner "local-exec" {
     command = "echo ${length(var.dependencies)}"
-  }
-}
-
-provider "kubernetes" {
-  load_config_file       = false
-  host                   = var.gke_endpoint
-  token                  = var.access_token
-  cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
-}
-
-resource "kubernetes_service_account" "tiller" {
-  metadata {
-    name = "tiller"
-    namespace = "kube-system"
-  }
-  depends_on = [null_resource.dependency_getter]
-}
-
-resource "kubernetes_cluster_role_binding" "tiller" {
-  metadata {
-    name = "tiller"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind = "ClusterRole"
-    name = "cluster-admin"
-  }
-  subject {
-    kind = "ServiceAccount"
-    name = kubernetes_service_account.tiller.metadata[0].name
-    namespace = "kube-system"
   }
 }
 
@@ -59,15 +26,80 @@ resource "kubernetes_secret" "database_secrets" {
   }
 }
 
-provider "helm" {
-  service_account = kubernetes_service_account.tiller.metadata[0].name
-  install_tiller = true
-  tiller_image = "gcr.io/kubernetes-helm/tiller:v2.15.2"
+data "helm_repository" "istio_release" {
+  name = "istio.io"
+  url = "https://storage.googleapis.com/istio-release/releases/1.3.4/charts/"
+}
 
-  kubernetes {
-    load_config_file       = false
-    host                   = var.gke_endpoint
-    token                  = var.access_token
-    cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
+resource "helm_release" "istio_init" {
+  name = "istio-init"
+  chart = "istio.io/istio-init"
+  namespace = "istio-system"
+  repository = data.helm_repository.istio_release.metadata[0].name
+  wait = true
+  timeout = 1200
+  depends_on = [null_resource.dependency_getter]
+  provisioner "local-exec" {
+    when = "destroy"
+    command = "sleep 180"
+  }
+}
+
+resource "null_resource" "wait_crd" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+  triggers = {
+    istio_init_id = helm_release.istio_init.id
+  }
+  depends_on = [helm_release.istio_init]
+}
+
+resource "helm_release" "istio" {
+  name = "istio"
+  chart = "istio.io/istio"
+  namespace = "istio-system"
+  repository = data.helm_repository.istio_release.metadata[0].name
+  depends_on = [null_resource.wait_crd]
+  wait = false
+
+  values = [
+    file("${path.module}/files/values-istio-demo.yaml")
+  ]
+
+  set {
+    name = "gateways.istio-ingressgateway.loadBalancerIP"
+    value = var.gateway_address
+  }
+}
+
+resource "null_resource" "wait_istio" {
+  triggers = {
+    istio_id = helm_release.istio.id
+  }
+  provisioner "local-exec" {
+    command = "sleep 120"
+  }
+}
+
+resource "helm_release" "berlioz" {
+  chart = "${path.root}/../charts/berlioz"
+  name = "berlioz"
+  namespace = kubernetes_namespace.berlioz_namespace.metadata[0].name
+  depends_on = [null_resource.wait_istio]
+
+  set {
+    name = "database.secretName"
+    value = kubernetes_secret.database_secrets.metadata[0].name
+  }
+
+  set {
+    name = "backend.image"
+    value = var.web_image
+  }
+
+  set {
+    name = "frontend.image"
+    value = var.web_image
   }
 }

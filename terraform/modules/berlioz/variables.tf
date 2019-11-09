@@ -2,12 +2,6 @@ variable "gateway_address" {
   default = ""
 }
 
-variable "gke_endpoint" {}
-
-variable "access_token" {}
-
-variable "cluster_ca_certificate" {}
-
 variable "namespace" {
   default = "berlioz"
 }
@@ -24,3 +18,7 @@ variable "mysql_user" {}
 variable "mysql_password" {}
 
 variable "mysql_database" {}
+
+variable "app_image" {}
+
+variable "web_image" {}
