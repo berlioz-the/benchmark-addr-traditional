@@ -72,5 +72,6 @@ workflows:
       - hold:
           type: approval
       - terraform_undeploy:
+          context: staging
           requires: 
             - hold
