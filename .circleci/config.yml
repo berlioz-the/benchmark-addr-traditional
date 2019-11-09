@@ -25,6 +25,7 @@ jobs:
   terraform_undeploy:
     executor: terraform/terraform-0_12
     steps:
+      - checkout
       - run:
           name: Select terraform version
           command: tfswitch 0.12.13
