@@ -95,7 +95,7 @@ resource "helm_release" "berlioz" {
 
   set {
     name = "backend.image"
-    value = var.web_image
+    value = var.app_image
   }
 
   set {
